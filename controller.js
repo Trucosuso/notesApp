@@ -1,6 +1,6 @@
 // @ts-check
 import { Note } from "./models.js";
-import { CorkView, NoteCorkView } from "./views.js";
+import { CorkView, GenericNoteView } from "./views.js";
 
 /**
  * Controller class for note and its views
@@ -25,7 +25,7 @@ class NotesController {
         // Is dragging
         this.dragging = false;
         // Which note to move when clicked
-        /** @type {NoteCorkView} */
+        /** @type {GenericNoteView} */
         this.noteToMove = null;
 
         // Add event listener to move notes to window
@@ -36,7 +36,7 @@ class NotesController {
             }
         });
 
-        /** @type {Array<Note>} Array to store all the notes*/
+        /** @type {Array<Note>} Array to store all the notes */
         this.notes = [];
 
         // ID to assing to the next note
@@ -104,8 +104,7 @@ class NotesController {
      * @param {MouseEvent} e 
      */
     startEdit(e) {
-        /** @type {NoteCorkView} */
-        // @ts-ignore
+        /** @type {GenericNoteView} */
         let noteView = e.target.parentElement.parentElement;
         noteView.startEditNote();
         noteView.applyIcon.addEventListener("click", this.endEdit.bind(this));
@@ -116,8 +115,7 @@ class NotesController {
      * @param {MouseEvent} e 
      */
     endEdit(e) {
-        /** @type {NoteCorkView} */
-        // @ts-ignore
+        /** @type {GenericNoteView} */
         let noteView = e.target.parentElement.parentElement;
         noteView.endEditNote();
 
@@ -134,7 +132,7 @@ class NotesController {
      * @param {MouseEvent} e 
      */
     deleteNote(e) {
-        /** @type {NoteCorkView} */
+        /** @type {GenericNoteView} */
         // @ts-ignore
         let noteView = e.target.parentElement.parentElement;
 
