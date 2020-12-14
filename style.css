@@ -142,3 +142,9 @@ header {
     text-align: right;
     font-weight: lighter;
 }
+
+.noteButtonCork {
+    border: none;
+    background: none;
+    padding: none;
+}

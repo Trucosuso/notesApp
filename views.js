@@ -48,7 +48,6 @@ class GenericView {
      */
     // eslint-disable-next-line no-unused-vars
     updateNote(id, title, text, color) { }
-
 }
 
 /**
@@ -170,6 +169,9 @@ class NoteCorkView extends HTMLDivElement {
         // ID
         this.noteID = noteID;
 
+        // Can be dragged
+        this.canBeDragged = true;
+
         // Note title
         this.noteTitle = document.createElement("p");
         this.noteTitle.appendChild(document.createTextNode(noteTitle));
@@ -187,17 +189,91 @@ class NoteCorkView extends HTMLDivElement {
         this.creationDateText.appendChild(document.createTextNode("Created at " + this.creationDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })));
         this.creationDateText.classList.add("noteTimeCork");
 
+        // Edit icon
+        this.editIcon = document.createElement("button");
+        this.editIcon.classList.add("material-icons");
+        this.editIcon.classList.add("noteButtonCork");
+        this.editIcon.appendChild(document.createTextNode("create"));
+
         // Delete icon
-        this.deleteIcon = document.createElement("span");
+        this.deleteIcon = document.createElement("button");
         this.deleteIcon.classList.add("material-icons");
-        this.deleteIcon.classList.add("noteDeleteIconCork");
-        this.deleteIcon.style.cursor = "pointer";
+        this.deleteIcon.classList.add("noteButtonCork");
         this.deleteIcon.appendChild(document.createTextNode("delete"));
 
+        // Input to edit title
+        this.noteTitleInput = document.createElement("input");
+        this.noteTitleInput.type = "text";
+        this.noteTitleInput.value = this.noteTitle.innerText;
+        this.noteTitleInput.classList.add("noteTitleCork");
+        this.noteTitleInput.style.display = "none";
+
+        // Input to edit text
+        this.noteTextInput = document.createElement("textarea");
+        this.noteTextInput.value = this.noteText.innerText;
+        this.noteTextInput.rows = 10;
+        this.noteTextInput.classList.add("noteTextCork");
+        this.noteTextInput.style.display = "none";
+
+        // Apply edit icon
+        this.applyIcon = document.createElement("button");
+        this.applyIcon.classList.add("material-icons");
+        this.applyIcon.classList.add("noteButtonCork");
+        this.applyIcon.appendChild(document.createTextNode("done"));
+        this.applyIcon.style.display = "none";
+
+        // Div to position the icons correctly
+        let iconsDiv = document.createElement("div");
+        iconsDiv.appendChild(this.editIcon);
+        iconsDiv.appendChild(this.applyIcon);
+        iconsDiv.appendChild(this.deleteIcon);
+
         this.appendChild(this.noteTitle);
+        this.appendChild(this.noteTitleInput);
         this.appendChild(this.noteText);
-        this.appendChild(this.deleteIcon);
+        this.appendChild(this.noteTextInput);
+        this.appendChild(iconsDiv);
         this.appendChild(this.creationDateText);
+    }
+
+    /**
+     * Changes the note to edit mode
+     */
+    startEditNote() {
+        // Stop ability to drag note
+        this.canBeDragged = false;
+
+        // Change edit button to apply changes button
+        this.editIcon.style.display = "none";
+        this.applyIcon.style.display = "";
+
+        // Change view to edit inputs
+        this.noteTitle.style.display = "none";
+        this.noteTitleInput.style.display = "";
+
+        this.noteText.style.display = "none";
+        this.noteTextInput.style.display = "";
+    }
+
+    /**
+     * Changes the note back to default mode updating the changes
+     */
+    endEditNote() {
+        // Restore ability to drag note
+        this.canBeDragged = true;
+
+        // Change apply button to edit button
+        this.applyIcon.style.display = "none";
+        this.editIcon.style.display = "";
+
+        // Change view to display text updating the changes
+        this.noteTitle.textContent = this.noteTitleInput.value;
+        this.noteTitleInput.style.display = "none";
+        this.noteTitle.style.display = "";
+
+        this.noteText.textContent = this.noteTextInput.value;
+        this.noteTextInput.style.display = "none";
+        this.noteText.style.display = "";
     }
 }
 

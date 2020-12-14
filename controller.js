@@ -22,6 +22,20 @@ class NotesController {
             });
         });
 
+        // Is dragging
+        this.dragging = false;
+        // Which note to move when clicked
+        /** @type {NoteCorkView} */
+        this.noteToMove = null;
+
+        // Add event listener to move notes to window
+        window.addEventListener("mousemove", (e) => {
+            if (this.dragging && this.noteToMove.canBeDragged) {
+                this.noteToMove.style.left = (e.clientX - 150) + "px";
+                this.noteToMove.style.top = (e.clientY - 30) + "px";
+            }
+        });
+
         /** @type {Array<Note>} Array to store all the notes*/
         this.notes = [];
 
@@ -33,10 +47,31 @@ class NotesController {
 
         // Add stored notes to view
         for (const note of this.notes) {
-            let noteView = this.view.createNote(note.id, note.title, note.text, note.timestamp, note.color);
-            noteView.deleteIcon.addEventListener("click", this.deleteNote.bind(this));
+            this.addNoteToView(note);
         }
+    }
 
+    /**
+     * Adds note to view. Addind its correspondant event listeners.
+     * @param {Note} note Note to add to view
+     */
+    addNoteToView(note) {
+        let noteView = this.view.createNote(note.id, note.title, note.text, note.timestamp, note.color);
+
+        // Add event listener to delete icon
+        noteView.deleteIcon.addEventListener("click", this.deleteNote.bind(this));
+
+        // Add event listener to edit icon
+        noteView.editIcon.addEventListener("click", this.startEdit.bind(this));
+
+        // Add event listeners to move the note
+        noteView.addEventListener("mousedown", (e) => {
+            this.noteToMove = e.currentTarget;
+            this.dragging = true;
+        });
+        noteView.addEventListener("mouseup", () => {
+            this.dragging = false;
+        });
     }
 
     /**
@@ -50,14 +85,41 @@ class NotesController {
             let timestamp = Date.now();
             let note = new Note(this.id, title, text, timestamp);
             this.notes.push(note);
-            let noteView = this.view.createNote(this.id, title, text, timestamp, "#FFFFFF");
+            this.addNoteToView(note);
             this.view.closeNewNoteFrame();
             this.saveNotes();
             this.id++;
-
-            // Add event listener to delete icon
-            noteView.deleteIcon.addEventListener("click", this.deleteNote.bind(this));
         }
+    }
+
+    /**
+     * Starts editing the note clicked by the user
+     * @param {MouseEvent} e 
+     */
+    startEdit(e) {
+        /** @type {NoteCorkView} */
+        // @ts-ignore
+        let noteView = e.target.parentElement.parentElement;
+        noteView.startEditNote();
+        noteView.applyIcon.addEventListener("click", this.endEdit.bind(this));
+    }
+
+    /**
+     * Ends editing the note clicked by the user and saves the changes
+     * @param {MouseEvent} e 
+     */
+    endEdit(e) {
+        /** @type {NoteCorkView} */
+        // @ts-ignore
+        let noteView = e.target.parentElement.parentElement;
+        noteView.endEditNote();
+
+        // Save changes to model
+        let modifiedNote = this.notes.find((note) => note.id == noteView.noteID);
+        modifiedNote.title = noteView.noteTitle.textContent;
+        modifiedNote.text = noteView.noteText.textContent;
+
+        this.saveNotes();
     }
 
     /**
@@ -67,7 +129,7 @@ class NotesController {
     deleteNote(e) {
         /** @type {NoteCorkView} */
         // @ts-ignore
-        let noteView = e.target.parentElement;
+        let noteView = e.target.parentElement.parentElement;
 
         // Search in the this.notes array the note to delete
         let notePositionInArray = this.notes.findIndex((note) => note.id == noteView.noteID);
