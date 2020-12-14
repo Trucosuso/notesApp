@@ -7,7 +7,7 @@ class GenericView {
      * Create a generic view
      */
     constructor() {
-        /** @type {Array<HTMLDivElement>} */
+        /** @type {Array<GenericNoteView>} */
         this.notes = [];
     }
 
@@ -38,16 +38,65 @@ class GenericView {
      */
     // eslint-disable-next-line no-unused-vars
     deleteNote(notePositionInArray) { }
+}
+
+/**
+ * Class representing a generic note view
+ * @extends HTMLDivElement
+ */
+class GenericNoteView extends HTMLDivElement {
+    /**
+     * Creates a note view
+     * @param {Number} noteID Note ID
+     * @param {String} noteTitle Note title
+     * @param {String} noteText Note body
+     */
+    constructor(noteID, noteTitle, noteText) {
+        super();
+
+        // ID
+        this.noteID = noteID;
+
+        // Can be dragged
+        /** @type {Boolean} */
+        this.canBeDragged;
+
+        // Note title
+        this.noteTitle = document.createElement("p");
+        this.noteTitle.appendChild(document.createTextNode(noteTitle));
+
+        // Note text
+        this.noteText = document.createElement("p");
+        this.noteText.appendChild(document.createTextNode(noteText));
+        this.noteText.style.whiteSpace = "pre-wrap";
+
+        // Edit icon
+        this.editIcon = document.createElement("button");
+        this.editIcon.classList.add("material-icons");
+        this.editIcon.appendChild(document.createTextNode("create"));
+
+        // Delete icon
+        this.deleteIcon = document.createElement("button");
+        this.deleteIcon.classList.add("material-icons");
+        this.deleteIcon.appendChild(document.createTextNode("delete"));
+
+        // Apply edit icon
+        this.applyIcon = document.createElement("button");
+        this.applyIcon.classList.add("material-icons");
+        this.applyIcon.appendChild(document.createTextNode("done"));
+    }
+
+    updateTime() { }
 
     /**
-     * Updates a note in view
-     * @param {Number} id Note ID
-     * @param {String} title Note title
-     * @param {String} text Note body
-     * @param {String} color Note color
+     * Changes the note to edit mode
      */
-    // eslint-disable-next-line no-unused-vars
-    updateNote(id, title, text, color) { }
+    startEditNote() { }
+
+    /**
+     * Changes the note back to default mode updating the changes
+     */
+    endEditNote() { }
 }
 
 /**
@@ -145,9 +194,9 @@ class CorkView extends GenericView {
 
 /**
  * Class representing a note on the cork board
- * @extends HTMLDivElement
+ * @extends GenericNoteView
  */
-class NoteCorkView extends HTMLDivElement {
+class NoteCorkView extends GenericNoteView {
     /**
      * Creates a note view
      * @param {Number} noteID Note ID
@@ -158,7 +207,7 @@ class NoteCorkView extends HTMLDivElement {
      * @param {Number} y Y coordinate of the top left side of the note in pixels
      */
     constructor(noteID, noteTitle, noteText, noteTimestamp, x, y) {
-        super();
+        super(noteID, noteTitle, noteText);
         // Styles
         this.style.width = "20rem";
         this.style.position = "absolute";
@@ -166,40 +215,27 @@ class NoteCorkView extends HTMLDivElement {
         this.style.top = y + "px";
         this.classList.add("noteCork");
 
-        // ID
-        this.noteID = noteID;
-
         // Can be dragged
         this.canBeDragged = true;
 
         // Note title
-        this.noteTitle = document.createElement("p");
-        this.noteTitle.appendChild(document.createTextNode(noteTitle));
         this.noteTitle.classList.add("noteTitleCork");
 
         // Note text
-        this.noteText = document.createElement("p");
-        this.noteText.appendChild(document.createTextNode(noteText));
-        this.noteText.style.whiteSpace = "pre-wrap";
         this.noteText.classList.add("noteTextCork");
 
         // Note creation date and text to show it
-        this.creationDate = new Date(noteTimestamp);
+        this.timestamp = noteTimestamp;
         this.creationDateText = document.createElement("p");
-        this.creationDateText.appendChild(document.createTextNode("Created at " + this.creationDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })));
+        this.creationDateText.appendChild(document.createTextNode(""));
         this.creationDateText.classList.add("noteTimeCork");
+        this.updateTime();
 
         // Edit icon
-        this.editIcon = document.createElement("button");
-        this.editIcon.classList.add("material-icons");
         this.editIcon.classList.add("noteButtonCork");
-        this.editIcon.appendChild(document.createTextNode("create"));
 
         // Delete icon
-        this.deleteIcon = document.createElement("button");
-        this.deleteIcon.classList.add("material-icons");
         this.deleteIcon.classList.add("noteButtonCork");
-        this.deleteIcon.appendChild(document.createTextNode("delete"));
 
         // Input to edit title
         this.noteTitleInput = document.createElement("input");
@@ -216,10 +252,7 @@ class NoteCorkView extends HTMLDivElement {
         this.noteTextInput.style.display = "none";
 
         // Apply edit icon
-        this.applyIcon = document.createElement("button");
-        this.applyIcon.classList.add("material-icons");
         this.applyIcon.classList.add("noteButtonCork");
-        this.applyIcon.appendChild(document.createTextNode("done"));
         this.applyIcon.style.display = "none";
 
         // Div to position the icons correctly
@@ -237,7 +270,40 @@ class NoteCorkView extends HTMLDivElement {
     }
 
     /**
+     * Updates the text indicating when the note was created
+     * @override
+     */
+    updateTime() {
+        // Get how long ago it was created
+        let dateUnits = {
+            day: 86400,
+            hour: 3600,
+            minute: 60,
+            second: 1
+        };
+
+        // Function to get time and correspondant unit
+        let getUnitAndValueDate = (secondsElapsed) => {
+            for (const [unit, secondsInUnit] of Object.entries(dateUnits)) {
+                if (secondsElapsed >= secondsInUnit || unit === "second") {
+                    const value = Math.floor(secondsElapsed / secondsInUnit) * -1;
+                    return { value, unit };
+                }
+            }
+        };
+
+
+        let rtf = new Intl.RelativeTimeFormat("en", { style: "narrow" });
+        let secondsElapsed = (Date.now() - this.timestamp) / 1000;
+        let { value, unit } = getUnitAndValueDate(secondsElapsed);
+
+        // Update Text
+        this.creationDateText.textContent = rtf.format(value, unit);
+    }
+
+    /**
      * Changes the note to edit mode
+     * @override
      */
     startEditNote() {
         // Stop ability to drag note
@@ -257,6 +323,7 @@ class NoteCorkView extends HTMLDivElement {
 
     /**
      * Changes the note back to default mode updating the changes
+     * @override
      */
     endEditNote() {
         // Restore ability to drag note
@@ -320,4 +387,4 @@ class NewNoteFrameCork extends HTMLDivElement {
 }
 
 
-export { CorkView, NoteCorkView };
+export { CorkView, GenericNoteView };
