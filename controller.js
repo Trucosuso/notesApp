@@ -49,6 +49,13 @@ class NotesController {
         for (const note of this.notes) {
             this.addNoteToView(note);
         }
+
+        // Update time in notes every 10 seconds
+        setInterval(() => {
+            for (const noteView of this.view.notes) {
+                noteView.updateTime();
+            }
+        }, 10000);
     }
 
     /**

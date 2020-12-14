@@ -184,10 +184,11 @@ class NoteCorkView extends HTMLDivElement {
         this.noteText.classList.add("noteTextCork");
 
         // Note creation date and text to show it
-        this.creationDate = new Date(noteTimestamp);
+        this.timestamp = noteTimestamp;
         this.creationDateText = document.createElement("p");
-        this.creationDateText.appendChild(document.createTextNode("Created at " + this.creationDate.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })));
+        this.creationDateText.appendChild(document.createTextNode(""));
         this.creationDateText.classList.add("noteTimeCork");
+        this.updateTime();
 
         // Edit icon
         this.editIcon = document.createElement("button");
@@ -234,6 +235,34 @@ class NoteCorkView extends HTMLDivElement {
         this.appendChild(this.noteTextInput);
         this.appendChild(iconsDiv);
         this.appendChild(this.creationDateText);
+    }
+
+    updateTime() {
+        // Get how long ago it was created
+        let dateUnits = {
+            day: 86400,
+            hour: 3600,
+            minute: 60,
+            second: 1
+        };
+
+        // Function to get time and correspondant unit
+        let getUnitAndValueDate = (secondsElapsed) => {
+            for (const [unit, secondsInUnit] of Object.entries(dateUnits)) {
+                if (secondsElapsed >= secondsInUnit || unit === "second") {
+                    const value = Math.floor(secondsElapsed / secondsInUnit) * -1;
+                    return { value, unit };
+                }
+            }
+        };
+
+
+        let rtf = new Intl.RelativeTimeFormat("en", { style: "narrow" });
+        let secondsElapsed = (Date.now() - this.timestamp) / 1000;
+        let { value, unit } = getUnitAndValueDate(secondsElapsed);
+
+        // Update Text
+        this.creationDateText.textContent = rtf.format(value, unit);
     }
 
     /**
