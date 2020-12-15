@@ -1,14 +1,22 @@
 // @ts-check
 import { Note } from "./models.js";
-import { CorkView, GenericNoteView } from "./views.js";
+import { CorkView, StackView, GenericNoteView } from "./views.js";
 
 /**
  * Controller class for note and its views
  */
 class NotesController {
-    constructor() {
+    /**
+     * Loads the app with the chosen view
+     * @param {String} viewToLoad "cork" or "stack"
+     */
+    constructor(viewToLoad) {
         // Create view
-        this.view = new CorkView();
+        if (viewToLoad == "stack") {
+            this.view = new StackView();
+        } else {
+            this.view = new CorkView();
+        }
 
         // Adds event listener to create new note
         this.view.createNewNoteButton.addEventListener("click", () => {

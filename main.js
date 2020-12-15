@@ -4,5 +4,5 @@ import { NotesController } from "./controller.js";
 
 
 window.addEventListener("load", () => {
-    new NotesController();
+    new NotesController("stack");
 });
