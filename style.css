@@ -72,6 +72,11 @@ header {
     font-size: large;
 }
 
+.changeViewButtonCork {
+    padding: 0.1rem 1rem;
+    font-size: large;
+}
+
 .newNoteFrameCork {
     position: absolute;
     top: 5rem;
@@ -166,6 +171,8 @@ header {
     background: #FEEFC3;
     display: flex;
     flex-flow: column nowrap;
+    align-items: center;
+    justify-content: space-evenly;
     min-height: 100vh;
     padding: 1vw;
 }
@@ -174,6 +181,7 @@ header {
     color: #000000;
     font-family: 'Bitter', serif;
     font-size: x-large;
+    text-align: center;
 }
 
 .buttonStack {
@@ -199,6 +207,11 @@ header {
 
 .createNewNoteButtonStack {
     padding: 0.5rem;
+    font-size: large;
+}
+
+.changeViewButtonCork {
+    padding: 0.1rem 1rem;
     font-size: large;
 }
 

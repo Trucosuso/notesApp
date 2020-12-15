@@ -136,6 +136,14 @@ class CorkView extends GenericView {
         this.createNewNoteButton.appendChild(document.createTextNode("Add note"));
         controlPanel.appendChild(this.createNewNoteButton);
 
+        // Button to change view
+        this.changeViewButton = document.createElement("button");
+        this.changeViewButton.id = "changeViewButton";
+        this.changeViewButton.classList.add("buttonCork");
+        this.changeViewButton.classList.add("changeViewButtonCork");
+        this.changeViewButton.appendChild(document.createTextNode("Change view"));
+        controlPanel.appendChild(this.changeViewButton);
+
         this.ui.appendChild(controlPanel);
 
         // Where to put notes
@@ -146,9 +154,9 @@ class CorkView extends GenericView {
         /** @type {NewNoteFrameCork} */
         this.newNoteFrame;
 
-        // Define custom HTML elements
-        customElements.define("new-note-frame-cork", NewNoteFrameCork, { extends: "div" });
-        customElements.define("note-cork", NoteCorkView, { extends: "div" });
+        // Define custom HTML elements. Done in main
+        /* customElements.define("new-note-frame-cork", NewNoteFrameCork, { extends: "div" });
+        customElements.define("note-cork", NoteCorkView, { extends: "div" }); */
     }
 
     /**
@@ -416,7 +424,7 @@ class StackView extends GenericView {
 
         let appTitle = document.createElement("p");
         appTitle.classList.add("appTitleStack");
-        appTitle.appendChild(document.createTextNode("Notes"));
+        appTitle.appendChild(document.createTextNode("Notes app"));
         controlPanel.appendChild(appTitle);
 
         this.createNewNoteButton = document.createElement("button");
@@ -425,6 +433,14 @@ class StackView extends GenericView {
         this.createNewNoteButton.classList.add("createNewNoteButtonStack");
         this.createNewNoteButton.appendChild(document.createTextNode("Create new note"));
         controlPanel.appendChild(this.createNewNoteButton);
+
+        // Button to change view
+        this.changeViewButton = document.createElement("button");
+        this.changeViewButton.id = "changeViewButton";
+        this.changeViewButton.classList.add("buttonStack");
+        this.changeViewButton.classList.add("createNewNoteButtonStack");
+        this.changeViewButton.appendChild(document.createTextNode("Change view"));
+        controlPanel.appendChild(this.changeViewButton);
 
         this.ui.appendChild(controlPanel);
 
@@ -440,9 +456,9 @@ class StackView extends GenericView {
         // Order for note to be flex elements
         this.order = 0;
 
-        // Define custom HTML elements
-        customElements.define("new-note-frame-stack", NewNoteFrameStack, { extends: "div" });
-        customElements.define("note-stack", NoteStackView, { extends: "div" });
+        // Define custom HTML elements. Done in main because i dont know how to check if they are already defined
+        /* customElements.define("new-note-frame-stack", NewNoteFrameStack, { extends: "div" });
+        customElements.define("note-stack", NoteStackView, { extends: "div" }); */
     }
 
     /**
@@ -689,4 +705,4 @@ class NoteStackView extends GenericNoteView {
     }
 }
 
-export { CorkView, StackView, GenericNoteView };
+export { GenericView, GenericNoteView, CorkView, NewNoteFrameCork, NoteCorkView, StackView, NewNoteFrameStack, NoteStackView }
