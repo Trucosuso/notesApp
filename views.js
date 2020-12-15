@@ -705,4 +705,4 @@ class NoteStackView extends GenericNoteView {
     }
 }
 
-export { GenericView, GenericNoteView, CorkView, NewNoteFrameCork, NoteCorkView, StackView, NewNoteFrameStack, NoteStackView }
+export { GenericView, GenericNoteView, CorkView, NewNoteFrameCork, NoteCorkView, StackView, NewNoteFrameStack, NoteStackView };
