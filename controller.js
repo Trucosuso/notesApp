@@ -164,7 +164,6 @@ class NotesController {
      */
     deleteNote(e) {
         /** @type {GenericNoteView} */
-        // @ts-ignore
         let noteView = e.target.parentElement.parentElement;
 
         // Search in the this.notes array the note to delete
