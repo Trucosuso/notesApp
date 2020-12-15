@@ -1,26 +1,19 @@
 // @ts-check
 import { Note } from "./models.js";
-import { CorkView, GenericNoteView } from "./views.js";
+import { CorkView, StackView, GenericNoteView } from "./views.js";
 
 /**
  * Controller class for note and its views
  */
 class NotesController {
-    constructor() {
+    /**
+     * Loads the app with the chosen view
+     * @param {String} viewToLoad "cork" or "stack"
+     */
+    constructor(viewToLoad = "cork") {
         // Create view
-        this.view = new CorkView();
-
-        // Adds event listener to create new note
-        this.view.createNewNoteButton.addEventListener("click", () => {
-            this.view.createNewNoteFrame();
-            this.view.createNewNoteButton.disabled = true;
-            this.view.createNewNoteButton.classList.add("disabled");
-
-            // Add event listener to create note to the add note button
-            this.view.newNoteFrame.addNoteButton.addEventListener("click", () => {
-                this.createNote();
-            });
-        });
+        /** @type {CorkView|StackView} */
+        this.view;
 
         // Is dragging
         this.dragging = false;
@@ -45,10 +38,7 @@ class NotesController {
         // Load stored notes if there are any
         this.loadStoredNotes();
 
-        // Add stored notes to view
-        for (const note of this.notes) {
-            this.addNoteToView(note);
-        }
+        this.loadView(viewToLoad);
 
         // Update time in notes every 10 seconds
         setInterval(() => {
@@ -56,6 +46,47 @@ class NotesController {
                 noteView.updateTime();
             }
         }, 10000);
+    }
+
+    /**
+     * Loads the selected UI
+     * @param {String} viewToLoad "cork" or "stack"
+     */
+    loadView(viewToLoad) {
+        // Load selected UI
+        if (viewToLoad == "stack") {
+            this.view = new StackView();
+        } else {
+            this.view = new CorkView();
+        }
+
+        // Adds event listener to create new note button
+        this.view.createNewNoteButton.addEventListener("click", () => {
+            this.view.createNewNoteFrame();
+            this.view.createNewNoteButton.disabled = true;
+            this.view.createNewNoteButton.classList.add("disabled");
+
+            // Add event listener to the add note button in the new note frame
+            this.view.newNoteFrame.addNoteButton.addEventListener("click", () => {
+                this.createNote();
+            });
+        });
+
+        // Add event listener to change the view to the other one
+        this.view.changeViewButton.addEventListener("click", () => {
+            if (this.view instanceof CorkView) {
+                document.body = document.createElement("body");
+                this.loadView("stack");
+            } else {
+                document.body = document.createElement("body");
+                this.loadView("cork");
+            }
+        });
+
+        // Add stored notes to view
+        for (const note of this.notes) {
+            this.addNoteToView(note);
+        }
     }
 
     /**
@@ -133,7 +164,6 @@ class NotesController {
      */
     deleteNote(e) {
         /** @type {GenericNoteView} */
-        // @ts-ignore
         let noteView = e.target.parentElement.parentElement;
 
         // Search in the this.notes array the note to delete
